@@ -7,9 +7,8 @@ require 'shoulda-matchers'
 require 'pry'
 
 require 'Cashier'
-require 'Item'
+require 'Purchase'
 require 'Product'
-require 'Manager'
 require 'Receipt'
 require 'Quantity'
 
@@ -20,9 +19,10 @@ ActiveRecord::Base.establish_connection(test_configuration)
 RSpec.configure do |config|
   config.after(:each) do
     Cashier.all.each { |cashier| cashier.destroy }
-    Item.all.each { |item| item.destroy }
+    Purchase.all.each { |purchase| purchase.destroy }
     Product.all.each { |product| product.destroy }
-    Manager.all.each { |manager| manager.destroy }
     Receipt.all.each { |receipt| receipt.destroy }
+    Quantity.all.each { |quantity| quantity.destroy }
+
   end
 end

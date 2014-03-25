@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140325185023) do
+ActiveRecord::Schema.define(version: 20140325225953) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,19 +20,16 @@ ActiveRecord::Schema.define(version: 20140325185023) do
     t.string "name"
   end
 
-  create_table "items", force: true do |t|
-    t.integer "product_id"
-    t.integer "receipt_id"
-    t.integer "quantity"
-  end
-
-  create_table "managers", force: true do |t|
-    t.string "name"
-  end
-
   create_table "products", force: true do |t|
     t.string  "name"
     t.decimal "price"
+  end
+
+  create_table "purchases", force: true do |t|
+    t.integer "product_id"
+    t.integer "receipt_id"
+    t.integer "quantity"
+    t.integer "cashier_id"
   end
 
   create_table "quantities", force: true do |t|
@@ -41,7 +38,7 @@ ActiveRecord::Schema.define(version: 20140325185023) do
   end
 
   create_table "receipts", force: true do |t|
-    t.integer "cashier_id"
+    t.decimal "total"
   end
 
 end

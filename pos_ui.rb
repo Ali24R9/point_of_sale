@@ -7,9 +7,8 @@ require 'shoulda-matchers'
 require 'pry'
 
 require './lib/Cashier'
-require './lib/Item'
+require './lib/Purchase'
 require './lib/Product'
-require './lib/Manager'
 require './lib/Receipt'
 require './lib/Quantity'
 
@@ -42,6 +41,8 @@ def manager_menu
   puts "Press A to add a new item"
   puts "Press V to view your inventory"
   puts "Press M to go to main menu"
+  puts "Press E to view all employees"
+  puts "Press NE to add a new employee"
   manager_answer = gets.chomp.upcase
   case manager_answer
     when "A"
@@ -50,6 +51,10 @@ def manager_menu
       view_inventory
     when "M"
       main_menu
+    when "E"
+      view_employees
+    when "NE"
+      add_employee
   end
 end
 
@@ -85,4 +90,65 @@ def view_inventory
   puts "**************************\n"
   main_menu
 end
-welcome
+
+def add_employee
+  puts "Enter the name of the new employee"
+  new_employee_name = gets.chomp
+  new_employee = Cashier.new({:name => new_employee_name})
+  new_employee.save
+  puts "#{new_employee_name} has been added to the system :)"
+manager_menu
+end
+
+def view_employees
+  puts "Here are all of your little worker bees:"
+  Cashier.all.each do |employee|
+    puts "#{employee.id}....#{employee.name}"
+  end
+  manager_menu
+end
+
+def employee_menu
+  puts "enter your name to login: "
+  login = gets.chomp
+
+  cashier = Cashier.where({:name => login}).first
+  if cashier == nil
+    puts 'invalid login, press r to retry or any other key to go back'
+    input = gets.chomp.downcase
+    case input
+    when 'r'
+      employee_menu
+    else
+      main_menu
+    end
+  else
+    ring_up(cashier)
+  end
+
+end
+
+def ring_up(cashier)
+  receipt = Receipt.create
+  input = ""
+  until input == 'n' do
+    puts "Enter product name: "
+    name = gets.chomp
+    puts "Enter quantity: "
+    quantity = gets.chomp
+    product = Product.where({:name => name}).first
+    purchase = Purchase.create({:product_id => product.id, :cashier_id => cashier.id, :receipt_id => receipt.id})
+    puts "Add purchase? y/n"
+    input = gets.chomp.downcase
+  end
+  customer_receipt = Purchase.where({:receipt_id => receipt.id})
+    total = 0
+    customer_receipt.each do |purchase|
+      add_to_receipt = Product.where({:id => purchase.product_id}).first
+      total += add_to_receipt.price.to_s.to_i
+    end
+    receipt.update(total: total)
+    puts "Your total is #{receipt.total}"
+  employee_menu
+end
+employee_menu
